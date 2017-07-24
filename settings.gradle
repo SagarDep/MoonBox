@@ -1,0 +1,1 @@
+include ':app', ':jumper', ':jumper-annotation', ':jumper-compiler'
