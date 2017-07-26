@@ -24,8 +24,8 @@ public class MainActivity extends AppCompatActivity implements AccountContract.V
 
         mPresenter = new AccountPresenter(this);
 
-        mNameEdit = findViewById(R.id.et_name);
-        mPasswordEdit = findViewById(R.id.et_password);
+        mNameEdit = (EditText) findViewById(R.id.et_name);
+        mPasswordEdit = (EditText) findViewById(R.id.et_password);
         findViewById(R.id.btn_submit).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

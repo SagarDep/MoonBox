@@ -1,8 +1,7 @@
 apply plugin: 'java-library'
 
 dependencies {
-    implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation project(':jumper-annotation')
+    compile project(':jumper-annotation')
 }
 
 sourceCompatibility = "1.7"
