@@ -12,7 +12,7 @@ import net.qiujuer.jumper.annotation.JumpWorkerThread;
  */
 public interface AccountContract {
     interface View {
-        @JumpUiThread
+        @JumpUiThread(JumpType.ASYNC)
         String getName();
 
         @JumpUiThread

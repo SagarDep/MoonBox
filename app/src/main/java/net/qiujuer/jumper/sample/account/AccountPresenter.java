@@ -18,6 +18,7 @@ public class AccountPresenter implements AccountContract.Presenter {
         mView = Jumper.wrap(view);
     }
 
+
     @Override
     public void login() {
         String name = mView.getName();
@@ -32,6 +33,16 @@ public class AccountPresenter implements AccountContract.Presenter {
 
         new Thread(new LoginRunnable(name, password)).start();
 
+    }
+
+    /**
+     * @param count Count
+     * @return String
+     * @see #start(int)
+     * @since 1.2.0
+     */
+    public String start(int count) {
+        return null;
     }
 
     @Override
