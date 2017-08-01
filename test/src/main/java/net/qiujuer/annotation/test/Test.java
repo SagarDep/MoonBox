@@ -39,7 +39,7 @@ public class Test {
     }
 
     @Retention(RetentionPolicy.RUNTIME)
-    @Target(ElementType.FIELD)
+    @Target({ElementType.FIELD,ElementType.CONSTRUCTOR})
     @interface PrimaryKey {
         String name() default "";
     }
@@ -47,6 +47,10 @@ public class Test {
     @DbTable("TB_User")
     @DbDatabase(name = "TestDatabase", version = 1)
     static class UserTable {
+        @PrimaryKey
+        public UserTable() {
+        }
+
         @PrimaryKey
         long id;
 

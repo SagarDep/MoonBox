@@ -1,6 +1,4 @@
-package net.qiujuer.jumper.sample.account;
-
-import android.support.annotation.StringRes;
+package net.qiujuer.jumper.sample.factory;
 
 import net.qiujuer.jumper.annotation.JumpType;
 import net.qiujuer.jumper.annotation.JumpUiThread;
@@ -10,28 +8,29 @@ import net.qiujuer.jumper.annotation.JumpWorkerThread;
  * @author qiujuer Email:qiujuer@live.cn
  * @version 1.0.0
  */
-public interface AccountContract {
+public interface HashContract {
     interface View {
-        @JumpUiThread(JumpType.ASYNC)
-        String getName();
 
-        @JumpUiThread
-        String getPassword();
+        void setPresenter(Presenter presenter);
 
         @JumpUiThread(JumpType.ASYNC)
-        void showLoading();
+        String getPath();
+
+        @JumpUiThread(JumpType.ASYNC)
+        void onStartCalculate();
+
+        @JumpUiThread(JumpType.AWAIT)
+        void onProgress(float progress);
 
         @JumpUiThread(JumpType.ASYNC)
         void onSucceed(String str);
 
         @JumpUiThread(JumpType.ASYNC)
-        void onFailed(@StringRes int strRes);
+        void onFailed(String str);
     }
 
     interface Presenter {
-        void login();
-
         @JumpWorkerThread
-        void start();
+        void startCalculate();
     }
 }

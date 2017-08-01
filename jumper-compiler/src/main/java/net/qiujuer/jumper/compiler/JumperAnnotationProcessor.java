@@ -43,13 +43,16 @@ public class JumperAnnotationProcessor extends AbstractProcessor {
         // processingEnv.getFiler().createSourceFile("net.qiujuer.jumper.apt.GeneratedClass");
         /*
         //对于Element直接强转
-
         */
+
+
         return true;
     }
 
     @Override
     public Set<String> getSupportedAnnotationTypes() {
+        // a.b.c$d
+        // a.b.c.d
         HashSet<String> hashSet = new HashSet<>();
         hashSet.add(JumpUiThread.class.getCanonicalName());
         hashSet.add(JumpWorkerThread.class.getCanonicalName());
@@ -101,7 +104,7 @@ public class JumperAnnotationProcessor extends AbstractProcessor {
     private void printError(ExecutableElement element, String message) {
         String className = element.getEnclosingElement().toString();
         String methodName = element.toString();
-        processingEnv.getMessager().printMessage(Diagnostic.Kind.WARNING, className + "#" + methodName + " " + message, element);
+        processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, className + "#" + methodName + " " + message, element);
     }
 
 }

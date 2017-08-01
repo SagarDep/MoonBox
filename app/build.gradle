@@ -21,6 +21,7 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'com.android.support:support-v4:25.4.0'
     androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
@@ -30,6 +31,9 @@ dependencies {
 
     implementation 'com.jakewharton:butterknife:8.7.0'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.7.0'
+
+    implementation 'net.qiujuer.genius:res:2.0.1'
+    implementation 'net.qiujuer.genius:ui:2.0.1'
 
     implementation project(':jumper-annotation')
     implementation project(':jumper')

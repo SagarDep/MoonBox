@@ -1,0 +1,30 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_vertical"
+    android:orientation="vertical"
+    tools:context="net.qiujuer.jumper.sample.HashFragment">
+
+    <net.qiujuer.genius.ui.widget.Loading
+        android:id="@+id/loading"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/len_16"
+        app:gAutoRun="false"
+        app:gBackgroundLineSize="@dimen/len_4"
+        app:gForegroundLineSize="@dimen/len_4"
+        app:gProgressFloat="0"
+        app:gProgressStyle="line" />
+
+    <net.qiujuer.genius.ui.widget.Button
+        android:id="@+id/btn_submit"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/len_64"
+        android:background="@color/amber_500"
+        android:gravity="center"
+        android:text="START"
+        android:textColor="@color/white" />
+
+</LinearLayout>
