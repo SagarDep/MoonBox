@@ -88,7 +88,7 @@ public class JumperAnnotationProcessor extends AbstractProcessor {
             List<? extends VariableElement> parameters = executableElement.getParameters();
             if (parameters != null && parameters.size() > 0) {
                 // 如果有参数输入
-                printError(executableElement, "JumpWorkerThread 暂不支持输入参数！");
+                // printError(executableElement, "JumpWorkerThread 暂不支持输入参数！");
             }
         }
     }

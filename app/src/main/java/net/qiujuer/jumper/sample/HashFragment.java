@@ -29,10 +29,24 @@ public class HashFragment extends Fragment implements HashContract.View {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View root = inflater.inflate(R.layout.fragment_hash, container, false);
+        root.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
 
         mLoading = (Loading) root.findViewById(R.id.loading);
         mSubmit = (Button) root.findViewById(R.id.btn_submit);
 
+        mLoading.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getFragmentManager().beginTransaction()
+                        .remove(HashFragment.this)
+                        .commit();
+            }
+        });
 
         mSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -77,5 +91,11 @@ public class HashFragment extends Fragment implements HashContract.View {
         mLoading.setProgress(0);
         mSubmit.setEnabled(true);
         Toast.makeText(getContext(), str, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mPresenter.dispose();
     }
 }

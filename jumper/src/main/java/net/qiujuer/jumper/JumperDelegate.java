@@ -1,6 +1,9 @@
 package net.qiujuer.jumper;
 
 
+import android.support.annotation.Nullable;
+
+import net.qiujuer.genius.kit.handler.Result;
 import net.qiujuer.genius.kit.handler.Run;
 import net.qiujuer.genius.kit.handler.runable.Action;
 import net.qiujuer.genius.kit.handler.runable.Func;
@@ -8,11 +11,15 @@ import net.qiujuer.jumper.annotation.JumpType;
 import net.qiujuer.jumper.annotation.JumpUiThread;
 import net.qiujuer.jumper.annotation.JumpWorkerThread;
 
+import java.lang.ref.Reference;
+import java.lang.ref.SoftReference;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * @author qiujuer Email:qiujuer@live.cn
@@ -20,14 +27,22 @@ import java.util.Arrays;
  */
 class JumperDelegate<T> implements InvocationHandler {
     private static final String TAG = JumperDelegate.class.getSimpleName();
-    private T target;
+    private final T target;
+    private final List<Reference<Result>> mResultReferences = new LinkedList<>();
+    private boolean mDone = false;
 
     JumperDelegate(T target) {
         this.target = target;
     }
 
     void clear() {
-        // TODO clear delay action
+        mDone = true;
+        for (Reference<Result> resultReference : mResultReferences) {
+            Result result = resultReference.get();
+            if (result != null) {
+                result.cancel();
+            }
+        }
     }
 
     @Override
@@ -37,22 +52,39 @@ class JumperDelegate<T> implements InvocationHandler {
         // Case Ui annotation
         JumpUiThread uiAnnotation = method.getAnnotation(JumpUiThread.class);
         if (uiAnnotation != null) {
-            return invokeUiJump(uiAnnotation, method, objects);
+            if (mDone) {
+                //throw new JumperException(String.format("Call method(%s-%s) error, because jumper handler is cancel.", method.getName(), Arrays.toString(objects)));
+                return buildReturnByType(method.getReturnType());
+            }
+            try {
+                return invokeUiJump(uiAnnotation, method, objects);
+            } catch (JumperException e) {
+                e.printStackTrace();
+            }
         }
 
         // Case Worker annotation
         JumpWorkerThread workerAnnotation = method.getAnnotation(JumpWorkerThread.class);
         if (workerAnnotation != null) {
-            return invokeWorkerJump(workerAnnotation, method, objects);
+            if (mDone) {
+                //throw new JumperException(String.format("Call method(%s-%s) error, because jumper handler is cancel.", method.getName(), Arrays.toString(objects)));
+                return buildReturnByType(method.getReturnType());
+            }
+            try {
+                return invokeWorkerJump(workerAnnotation, method, objects);
+            } catch (JumperException e) {
+                e.printStackTrace();
+            }
         }
 
         // The default
         return method.invoke(target, objects);
     }
 
-    private Object invokeUiJump(JumpUiThread annotation, final Method method, final Object[] objects) {
+    private Object invokeUiJump(JumpUiThread annotation, final Method method, final Object[] objects) throws JumperException {
         final JumpType jumpType = annotation.value();
         final Type returnType = method.getGenericReturnType();
+        Result result = null;
         switch (jumpType) {
             case AWAIT: {
                 if (returnType == void.class) {
@@ -74,7 +106,7 @@ class JumperDelegate<T> implements InvocationHandler {
                 break;
             }
             case ASYNC: {
-                Run.onUiAsync(new Action() {
+                result = Run.onUiAsync(new Action() {
                     @Override
                     public void call() {
                         callMethod(method, objects);
@@ -87,7 +119,7 @@ class JumperDelegate<T> implements InvocationHandler {
                 if (returnType == void.class) {
                     // If con't need return param
                     // We should use non blocking operations
-                    Run.onUiAsync(new Action() {
+                    result = Run.onUiAsync(new Action() {
                         @Override
                         public void call() {
                             callMethod(method, objects);
@@ -105,18 +137,29 @@ class JumperDelegate<T> implements InvocationHandler {
                 break;
         }
 
+        putResult(result);
         return buildReturnByType(method.getGenericReturnType());
     }
 
-    private Object invokeWorkerJump(JumpWorkerThread annotation, final Method method, final Object[] objects) {
+    @SuppressWarnings("unused")
+    private Object invokeWorkerJump(JumpWorkerThread annotation, final Method method, final Object[] objects) throws JumperException {
         // Support asynchronous operation only
-        Run.onBackground(new Action() {
+        Result result = Run.onBackground(new Action() {
             @Override
             public void call() {
                 callMethod(method, objects);
             }
         });
+        putResult(result);
         return buildReturnByType(method.getGenericReturnType());
+    }
+
+    private void checkDone(Method method, Object[] objects) throws JumperException {
+        // This handler is done, we can't do any request
+        if (mDone) {
+            throw new JumperException(String.format("Call method(%s-%s) error, because jumper handler is cancel.", method.getName(), Arrays.toString(objects)));
+            //return buildReturnByType(method.getReturnType());
+        }
     }
 
     private Object callMethod(final Method method, final Object[] objects) {
@@ -130,7 +173,14 @@ class JumperDelegate<T> implements InvocationHandler {
         return null;
     }
 
-    private Object buildReturnByType(Type returnType) {
+    @SuppressWarnings("unchecked")
+    private void putResult(@Nullable Result result) {
+        if (result == null)
+            return;
+        mResultReferences.add(new SoftReference(result));
+    }
+
+    private static Object buildReturnByType(Type returnType) {
         Log.p(TAG, "buildReturnByType wrap:" + returnType);
 
         if (returnType == int.class

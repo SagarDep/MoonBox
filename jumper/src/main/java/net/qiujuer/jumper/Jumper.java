@@ -20,11 +20,11 @@ public final class Jumper {
         return (T) Proxy.newProxyInstance(clx.getClassLoader(), clx.getInterfaces(), handler);
     }
 
-    public static <T> void dispose(T target) {
-        if (target == null)
+    public static <T> void dispose(T targetWrapper) {
+        if (targetWrapper == null)
             return;
-        if (Proxy.isProxyClass(target.getClass())) {
-            InvocationHandler handler = Proxy.getInvocationHandler(target);
+        if (Proxy.isProxyClass(targetWrapper.getClass())) {
+            InvocationHandler handler = Proxy.getInvocationHandler(targetWrapper);
             if (handler instanceof JumperDelegate) {
                 JumperDelegate delegate = (JumperDelegate) handler;
                 delegate.clear();

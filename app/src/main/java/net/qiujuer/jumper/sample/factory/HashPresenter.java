@@ -10,10 +10,12 @@ import net.qiujuer.jumper.Jumper;
  */
 public class HashPresenter implements HashContract.Presenter {
     private HashContract.View mView;
+    private HashContract.Presenter mPresenter;
 
     public HashPresenter(HashContract.View view) {
         mView = Jumper.wrap(view);
-        view.setPresenter(Jumper.wrap(this));
+        mPresenter = Jumper.wrap(this);
+        view.setPresenter(mPresenter);
     }
 
     private HashContract.View getView() {
@@ -37,5 +39,11 @@ public class HashPresenter implements HashContract.Presenter {
         }
 
         view.onSucceed("计算成功");
+    }
+
+    @Override
+    public void dispose() {
+        Jumper.dispose(mView);
+        Jumper.dispose(mPresenter);
     }
 }

@@ -32,5 +32,7 @@ public interface HashContract {
     interface Presenter {
         @JumpWorkerThread
         void startCalculate();
+
+        void dispose();
     }
 }
